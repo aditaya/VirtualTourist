@@ -19,6 +19,7 @@ class PhotoViewController: UIViewController {
         didSet {
             collectionView.delegate = self
             collectionView.dataSource = self
+            collectionView.allowsSelection = true
             collectionView.showLoadingBackgroundView()
         }
         
@@ -37,7 +38,7 @@ class PhotoViewController: UIViewController {
     private var pages: Int?
     private var perPage: Int?
     
-    var fetchedResultsController: NSFetchedResultsController<Photos>? {
+    var fetchedResultsController: NSFetchedResultsController<PersistedPhoto>? {
         didSet {
             fetchedResultsController?.delegate = self
         }
@@ -55,7 +56,7 @@ class PhotoViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        fetchedResultsController = NSFetchedResultsController<Photos>()
+        fetchedResultsController = NSFetchedResultsController<PersistedPhoto>()
         configureNSFetchedResultsController(with: mapPin!)
         loadViewData()
         loadMapData()
@@ -82,7 +83,7 @@ class PhotoViewController: UIViewController {
     private func loadViewData() {
         configureNSFetchedResultsController(with: mapPin)
         
-        guard let pinPhotos = mapPin.photos, pinPhotos.hashValue > 0 else {
+        guard let pinPhotos = mapPin.photos, pinPhotos.count > 0 else {
             downloadAlbumForPin(mapPin, page: getRandomPage())
             return
         }
@@ -154,7 +155,7 @@ class PhotoViewController: UIViewController {
     // MARK: - Configuration Functions
     
     private func configureNSFetchedResultsController(with mapPin: MapPin) {
-        let fetchRequest: NSFetchRequest<Photos> = Photos.fetchRequest()
+        let fetchRequest: NSFetchRequest<PersistedPhoto> = PersistedPhoto.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "mapPin == %@", mapPin)
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         
@@ -191,7 +192,7 @@ class PhotoViewController: UIViewController {
     
     private func downloadBackupPhoto(from url: String,
                                      for cell: AlbumViewCell,
-                                     _ photo: Photos) {
+                                     _ photo: PersistedPhoto) {
         
         FlickrService().getPhotoData(fromURL: url, onSuccess: { [weak self] (data) in
             guard let imageData = data else {
@@ -215,7 +216,7 @@ class PhotoViewController: UIViewController {
         })
     }
     
-    private func downloadBackupPhoto(_ photo: Photos) {
+    private func downloadBackupPhoto(_ photo: PersistedPhoto) {
         guard let url = photo.imageURL() else { return }
         FlickrService().getPhotoData(fromURL: url, onSuccess: { [weak self] (imageData) in
             
@@ -260,6 +261,7 @@ extension PhotoViewController: UICollectionViewDataSource {
             return 0
         }
         collectionView.hideBackgroudViews()
+        print(numberOfItemsInSection)
         return numberOfItemsInSection
     }
     
@@ -272,7 +274,7 @@ extension PhotoViewController: UICollectionViewDataSource {
     }
 }
 
-extension PhotoViewController: UICollectionViewDelegate {
+extension PhotoViewController: UICollectionViewDelegate{
     
     // MARK: - UICollectioView Delegate Methods
     

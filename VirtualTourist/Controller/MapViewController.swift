@@ -21,7 +21,7 @@ class MapViewController: UIViewController {
         }
     }
     
-    
+@IBOutlet private weak var longPressGestureRecognizer: UILongPressGestureRecognizer!
     // MARK: - Properties
     
     private var pinView: MKPinAnnotationView?
@@ -71,7 +71,7 @@ class MapViewController: UIViewController {
             let pin = sender as? MapPin,
             segue.destination is PhotoViewController else { return }
         
-        if segue.identifier == "AlbumSegue" {
+        if segue.identifier == "PhotoViewSegue" {
             destination.mapPin = pin
             destination.dataController = dataController
         }
@@ -153,7 +153,7 @@ class MapViewController: UIViewController {
         })
     }
     
-    private func downloadBackupPhoto(_ photo: Photos) {
+    private func downloadBackupPhoto(_ photo: PersistedPhoto) {
         debugPrint("PersistedPhoto with id = \(photo.objectID) has no data. GETing it from Flickr...")
         guard let url = photo.imageURL() else { return }
         FlickrService().getPhotoData(fromURL: url, onSuccess: { [weak self] (imageData) in
@@ -252,7 +252,7 @@ extension MapViewController: MKMapViewDelegate {
         
         dataController.fetchMapPin(with: pinIDForSelectedAnnotation, onSuccess: { [weak self] (mapPin) in
             guard let mapPin = mapPin else { return }
-            self?.performSegue(withIdentifier: "AlbumSegue", sender: mapPin)
+            self?.performSegue(withIdentifier: "PhotoViewSegue", sender: mapPin)
             
             }, onFailure: { [weak self] persistenceError in
                 ErrorHelper.logPersistenceError(persistenceError)

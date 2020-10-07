@@ -2,15 +2,14 @@
 //  AlbumViewCell.swift
 //  VirtualTourist
 //
-//  Created by Aditya Rana on 06.10.20.
+//  Created by Aditya Rana on 07.10.20.
 //
 
 import UIKit
 
 class AlbumViewCell: UICollectionViewCell {
-
     
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView! {
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!{
         didSet {
             activityIndicator.hidesWhenStopped = true
             activityIndicator.startAnimating()
@@ -18,7 +17,6 @@ class AlbumViewCell: UICollectionViewCell {
     }
     
     @IBOutlet weak var imageView: UIImageView!
-    
     
     // MARK: - Lifecycle
     
@@ -33,11 +31,10 @@ class AlbumViewCell: UICollectionViewCell {
     func configureWith(_ imageData: Data) {
         imageView.isHidden = false
         imageView.image = UIImage(data: imageData)
-        activityIndicator.stopAnimating()
+       activityIndicator.stopAnimating()
     }
     
     func configureWithNoImage() {
-        activityIndicator.stopAnimating()
+      activityIndicator.stopAnimating()
     }
-
 }

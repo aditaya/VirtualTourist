@@ -15,9 +15,9 @@ extension DataController {
     /// Creates a PersistedPhoto in Core Data using a FlickrPhoto.
     func createPersistedPhoto(from flickrPhoto: FlickrPhoto,
                               for mapPin: MapPin,
-                              inContext context: NSManagedObjectContext) -> Photos {
+                              inContext context: NSManagedObjectContext) -> PersistedPhoto {
         
-        let persistedPhoto = Photos(context: context)
+        let persistedPhoto = PersistedPhoto(context: context)
         
         persistedPhoto.id = flickrPhoto.id
         persistedPhoto.owner = flickrPhoto.owner
@@ -39,7 +39,7 @@ extension DataController {
     func convertAndPersist(_ flickrPhotos: [FlickrPhoto],
                            mapPin: MapPin,
                            context: CoreDataContext = .background,
-                           onSuccess succeeded: @escaping ((_ persistedPhotos: [Photos]) -> Void),
+                           onSuccess succeeded: @escaping ((_ persistedPhotos: [PersistedPhoto]) -> Void),
                            onFailure failed: ((PersistenceError?) -> Void)? = nil,
                            onCompletion completed: (() -> Void)? = nil) {
         
@@ -47,7 +47,7 @@ extension DataController {
         
         currentContext.perform {
             
-            var persistedPhotos = [Photos]()
+            var persistedPhotos = [PersistedPhoto]()
             
             // Converting flickr photos into persisted photos
             for flickrPhoto in flickrPhotos {
@@ -73,7 +73,7 @@ extension DataController {
     func addPersistedPhoto(_ flickrPhoto: FlickrPhoto,
                            mapPin: MapPin,
                            context: CoreDataContext = .background,
-                           onSuccess succeeded: @escaping ((_ persistedPhoto: Photos) -> Void),
+                           onSuccess succeeded: @escaping ((_ persistedPhoto: PersistedPhoto) -> Void),
                            onFailure failed: ((PersistenceError?) -> Void)? = nil,
                            onCompletion completed: (() -> Void)? = nil) {
         
@@ -81,7 +81,7 @@ extension DataController {
         
         currentContext.perform {
             
-            let persistedPhoto = Photos(context: currentContext)
+            let persistedPhoto = PersistedPhoto(context: currentContext)
             
             persistedPhoto.id = flickrPhoto.id
             persistedPhoto.owner = flickrPhoto.owner
@@ -150,7 +150,7 @@ extension DataController {
     }
     
     /// Deletes an array of PersistedPhoto´s from Core Data.
-    func deletePersistedPhotos(_ persistedPhotos: [Photos],
+    func deletePersistedPhotos(_ persistedPhotos: [PersistedPhoto],
                                context: CoreDataContext = .background,
                                onSuccess succeeded: @escaping (() -> Void),
                                onFailure failed: ((PersistenceError?) -> Void)? = nil,
@@ -181,7 +181,7 @@ extension DataController {
     /// Fetches a PersistedPhoto from Core Data using its ID.
     func fetchPersistedPhoto(withID id: String,
                            context: CoreDataContext = .view,
-                           onSuccess succeeded: @escaping ((_ photo: Photos?) -> Void),
+                           onSuccess succeeded: @escaping ((_ photo: PersistedPhoto?) -> Void),
                            onFailure failed: ((PersistenceError?) -> Void)? = nil,
                            onCompletion completed: (() -> Void)? = nil) {
         
@@ -189,7 +189,7 @@ extension DataController {
         
         currentContext.perform {
             
-            let fetchRequest = NSFetchRequest<Photos>(entityName: "PersistedPhoto")
+            let fetchRequest = NSFetchRequest<PersistedPhoto>(entityName: "PersistedPhoto")
             fetchRequest.fetchLimit = 1
             fetchRequest.predicate = NSPredicate(format: "id == %@", id)
             
@@ -221,7 +221,7 @@ extension DataController {
         
         let currentContext: NSManagedObjectContext = context == .background ? backgroundContext : viewContext
         
-        let persistedPhoto = currentContext.object(with: objectID) as! Photos
+        let persistedPhoto = currentContext.object(with: objectID) as! PersistedPhoto
         
         currentContext.perform {
             
